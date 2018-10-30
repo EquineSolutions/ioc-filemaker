@@ -17,7 +17,6 @@ class ShowsLayoutTest extends TestCase
         // When I run the index method on
         $results = $showsLayout->index();
         // Then I should see
-//        $this->assertTrue(true);
         $this->assertJson(json_encode($results));
     }
 
@@ -28,7 +27,8 @@ class ShowsLayoutTest extends TestCase
 
         $results = $showsLayout->show(1);
 
-        $this->assertJson(json_encode($results));
+        $this->assertArrayHasKey('show_id', $results[0]);
+//        $this->assertJson(json_encode($results));
     }
 
     /** @test */
@@ -37,7 +37,7 @@ class ShowsLayoutTest extends TestCase
         $showLayout = new ShowsLayout();
 
         $results = $showLayout->create([
-            'show_id' => '1001',
+            $showLayout->getIdFieldName() => '1001',
             'Show Name' => 'test show'
         ]);
 
@@ -64,6 +64,7 @@ class ShowsLayoutTest extends TestCase
         $showLayout = new ShowsLayout();
         $indexResponse = $showLayout->index();
         $last_record_id = $indexResponse[sizeof($indexResponse)-1]['record_id'];
+
         $results = $showLayout->delete($last_record_id);
 
         $this->assertJson(json_encode($results));
