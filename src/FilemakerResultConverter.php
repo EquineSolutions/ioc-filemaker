@@ -8,20 +8,25 @@
 
 namespace EquineSolutions\IOCFilemaker;
 
-use \airmoi\FileMaker\FileMaker;
-
-class ArrayConverter
+class FilemakerResultConverter
 {
-    public function toArray($filemakerResponse, FileMaker $filemaker)
+    private $results;
+
+    public function __construct($results)
+    {
+        $this->results = $results;
+    }
+
+    public function toArray()
     {
         $translatedArray = array();
-        foreach ($filemakerResponse as $singleRecord) {
-            array_push($translatedArray, $this->convertSingle($singleRecord, $filemaker));
+        foreach ($this->results as $singleRecord) {
+            array_push($translatedArray, $this->convertSingle($singleRecord));
         }
         return $translatedArray;
     }
 
-    private function convertSingle($record, FileMaker $filemaker)
+    private function convertSingle($record)
     {
         //TODO handle if the incoming field is image to be downloaded with getContainerDataURL
         $fields = $record->getFields();

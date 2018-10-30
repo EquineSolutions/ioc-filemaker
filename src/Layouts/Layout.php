@@ -9,7 +9,7 @@
 namespace EquineSolutions\IOCFilemaker\Layouts;
 
 
-use EquineSolutions\IOCFilemaker\ArrayConverter;
+use EquineSolutions\IOCFilemaker\FilemakerResultConverter;
 use EquineSolutions\IOCFilemaker\Connector;
 
 abstract class Layout
@@ -30,9 +30,11 @@ abstract class Layout
     public function index()
     {
         $filemaker = (new Connector())->filemaker();
-        return (new ArrayConverter())->toArray($filemaker->newFindCommand($this->getLayout())
-            ->execute()
-            ->getRecords(), $filemaker);
+        return (new FilemakerResultConverter(
+            $filemaker->newFindCommand($this->getLayout())
+                ->execute()
+                ->getRecords()
+        ))->toArray();
     }
 
     /**
@@ -45,10 +47,12 @@ abstract class Layout
     public function show($id)
     {
         $filemaker = (new Connector())->filemaker();
-        return (new ArrayConverter())->toArray($filemaker->newFindCommand($this->getLayout())
+        return (new FilemakerResultConverter(
+            $filemaker->newFindCommand($this->getLayout())
             ->addFindCriterion($this->getIdFieldName(), '='.$id)
             ->execute()
-            ->getRecords(), $filemaker);
+            ->getRecords()
+        ))->toArray();
     }
 
     /**
@@ -61,9 +65,11 @@ abstract class Layout
     public function create($data)
     {
         $filemaker = (new Connector())->filemaker();
-        return (new ArrayConverter())->toArray($filemaker->newAddCommand($this->getLayout(), $data)
+        return (new FilemakerResultConverter(
+            $filemaker->newAddCommand($this->getLayout(), $data)
             ->execute()
-            ->getRecords(), $filemaker);
+            ->getRecords()
+        ))->toArray();
     }
 
     /**
@@ -77,9 +83,11 @@ abstract class Layout
     public function update($record_id, $data)
     {
         $filemaker = (new Connector())->filemaker();
-        return (new ArrayConverter())->toArray($filemaker->newEditCommand($this->getLayout(), $record_id, $data)
-            ->execute()
-            ->getRecords(), $filemaker);
+        return (new FilemakerResultConverter(
+            $filemaker->newEditCommand($this->getLayout(), $record_id, $data)
+                ->execute()
+                ->getRecords()
+        ))->toArray();
     }
 
     /**
@@ -91,9 +99,11 @@ abstract class Layout
     public function delete($record_id)
     {
         $filemaker = (new Connector())->filemaker();
-        return (new ArrayConverter())->toArray($filemaker->newDeleteCommand($this->getLayout(), $record_id)
+        return (new FilemakerResultConverter(
+            $filemaker->newDeleteCommand($this->getLayout(), $record_id)
             ->execute()
-            ->getRecords(), $filemaker);
+            ->getRecords()
+        ))->toArray();
     }
 }
 

@@ -17,7 +17,12 @@ class ShowsLayoutTest extends TestCase
         // When I run the index method on
         $results = $showsLayout->index();
         // Then I should see
-        $this->assertJson(json_encode($results));
+        $fields = config('show');
+
+        $this->assertArrayHasKey(0, $results);
+
+        foreach ($fields as $field)
+            $this->assertArrayHasKey($field, $results[0]);
     }
 
     /** @test */
@@ -27,8 +32,12 @@ class ShowsLayoutTest extends TestCase
 
         $results = $showsLayout->show(1);
 
-        $this->assertArrayHasKey('show_id', $results[0]);
-//        $this->assertJson(json_encode($results));
+        $fields = config('show');
+
+        $this->assertArrayHasKey(0, $results);
+
+        foreach ($fields as $field)
+            $this->assertArrayHasKey($field, $results[0]);
     }
 
     /** @test */
@@ -41,7 +50,12 @@ class ShowsLayoutTest extends TestCase
             'Show Name' => 'test show'
         ]);
 
-        $this->assertJson(json_encode($results));
+        $fields = config('show');
+
+        $this->assertArrayHasKey(0, $results);
+
+        foreach ($fields as $field)
+            $this->assertArrayHasKey($field, $results[0]);
     }
 
     /** @test */
@@ -55,7 +69,12 @@ class ShowsLayoutTest extends TestCase
             'Show Name' => 'test show 2'
         ]);
 
-        $this->assertJson(json_encode($results));
+        $fields = config('show');
+
+        $this->assertArrayHasKey(0, $results);
+
+        foreach ($fields as $field)
+            $this->assertArrayHasKey($field, $results[0]);
     }
 
     /** @test */
@@ -67,7 +86,7 @@ class ShowsLayoutTest extends TestCase
 
         $results = $showLayout->delete($last_record_id);
 
-        $this->assertJson(json_encode($results));
+        $this->assertArrayNotHasKey(0, $results);
     }
 }
 

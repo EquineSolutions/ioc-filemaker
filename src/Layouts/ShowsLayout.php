@@ -15,6 +15,6 @@ class ShowsLayout extends Layout
 
     public function getIdFieldName()
     {
-        return 'show_id';
+        return config('show.id');
     }
 }
