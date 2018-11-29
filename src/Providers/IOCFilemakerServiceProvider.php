@@ -12,6 +12,7 @@ class IOCFilemakerServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(__DIR__ . '/../../config/ioc-filemaker.php', 'ioc-filemaker');
+        $this->mergeConfigFrom(__DIR__ . '/../../config/layouts.php', 'layouts');
     }
 
     /**

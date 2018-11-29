@@ -2,19 +2,36 @@
 
 namespace EquineSolutions\IOCFilemaker\Layouts;
 
-class ShowsLayout
+
+class ShowsLayout extends Layout
 {
-    public function __construct()
-    {
-        $this->layoutName = '';
+    /**
+     * returns the name of the layout
+     *
+     * @return string
+     */
+    public function getLayout(){
+        return 'PHP_SHOW';
     }
 
-    public function index()
+
+    /**
+     * returns the field name
+     *
+     * @return \Illuminate\Config\Repository|mixed
+     */
+    public function getIdFieldName()
     {
-        return [
-            'data' => [
-                'show_name' => 'abdo',
-            ]
-        ];
+        return config('layouts.show.id');
+    }
+
+    /**
+     * returns the fields map
+     *
+     * @return \Illuminate\Config\Repository|mixed
+     */
+    public function getFieldsMap()
+    {
+        return config('layouts.show');
     }
 }
