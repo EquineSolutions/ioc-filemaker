@@ -9,10 +9,11 @@ use EquineSolutions\IOCFilemaker\Connector;
 use EquineSolutions\IOCFilemaker\Traits\ConvertToArray;
 use EquineSolutions\IOCFilemaker\Traits\Filter;
 use EquineSolutions\IOCFilemaker\Traits\Paginate;
+use EquineSolutions\IOCFilemaker\Traits\Sort;
 
 abstract class Layout
 {
-    use Filter, ConvertToArray, Paginate;
+    use Filter, ConvertToArray, Paginate, Sort;
 
     /**
      * The filemaker class.
@@ -42,7 +43,19 @@ abstract class Layout
      */
     protected $last_record_id;
 
+    /**
+     * indicates whether getting last variable or paginating to stop recursion
+     *
+     * @var boolean
+     */
     private $skip_last_record;
+
+    /**
+     * the sort rule variable
+     *
+     * @var boolean
+     */
+    private $sort_rule;
 
     /**
      * Layout constructor.
@@ -53,6 +66,7 @@ abstract class Layout
         $this->filters = array();
         $this->last_record_id = null;
         $this->skip_last_record = false;
+        $this->sort_rule = [$this->getIdFieldName() => FileMaker::SORT_ASCEND];
     }
 
     /**
@@ -138,20 +152,6 @@ abstract class Layout
     }
 
     /**
-     * add sorting rule asc or desc
-     *
-     * @param $key
-     * @param $order
-     * @return $this
-     */
-    public function sort($key, $order = 'asc')
-    {
-        $order = $order == 'desc'? FileMaker::SORT_DESCEND:FileMaker::SORT_ASCEND;
-        $this->command->addSortRule($key, 1, $order);
-        return $this;
-    }
-
-    /**
      * executes the find command and returns mapped array
      *
      * @return array
@@ -159,6 +159,7 @@ abstract class Layout
     public function get()
     {
         $this->applyFilters();
+        $this->applySort();
         $response = [
             'data' => $this->convertToArray($this->command->execute()->getRecords())
         ];
@@ -213,10 +214,13 @@ abstract class Layout
     public function setLastRecordId()
     {
         $this->skip_last_record = true;
+        $old_sort_rule = $this->sort_rule;
+        $order = current($this->sort_rule) == FileMaker::SORT_DESCEND? 'asc':'desc';
         $this->last_record_id =  (int)$this->index()
-            ->sort($this->getIdFieldName(), 'desc')
+            ->sort(key($this->sort_rule), $order)
             ->paginate(1, 0)
             ->get()['data'][0]['id'];
+        $this->sort_rule = $old_sort_rule;
         $this->skip_last_record = false;
     }
 

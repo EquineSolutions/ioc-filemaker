@@ -10,10 +10,10 @@ class ShowsLayout extends Layout
      *
      * @return string
      */
-    public function getLayout(){
+    public function getLayout()
+    {
         return 'PHP_SHOW';
     }
-
 
     /**
      * returns the field name
