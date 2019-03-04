@@ -22,7 +22,7 @@ class Connector
      * Connector Construct.
      * @param $database_name
      */
-    public function __construct($database_name = 'ioc-database')
+    public function __construct($database_name)
     {
         $this->filemaker = new FileMaker(
             config("ioc-filemaker.$database_name"),

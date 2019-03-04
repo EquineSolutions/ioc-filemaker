@@ -2,6 +2,10 @@
 
 namespace EquineSolutions\IOCFilemaker\Traits;
 
+use airmoi\FileMaker\Object\Record;
+use EquineSolutions\IOCFilemaker\Exceptions\FieldDoesNotExist;
+use function PHPSTORM_META\type;
+
 trait ConvertToArray
 {
     /**
@@ -9,8 +13,10 @@ trait ConvertToArray
      *
      * @param $result
      * @return array
+     * @throws FieldDoesNotExist
+     * @throws \airmoi\FileMaker\FileMakerException
      */
-    private function convertToArray($result)
+    protected function convertToArray($result)
     {
         $converted_array = array();
         foreach ($result as $single_record)
@@ -23,16 +29,24 @@ trait ConvertToArray
     /**
      * maps single filemaker object to array
      *
-     * @param $record
+     * @param Record $record
      * @return array
+     * @throws FieldDoesNotExist
+     * @throws \airmoi\FileMaker\FileMakerException
      */
-    private function mapSingle($record)
+    protected function mapSingle(Record $record)
     {
         //TODO handle if the incoming field is image to be downloaded with getContainerDataURL
         $fields = $this->getFieldsMap();
         $converted_object = array();
+
+        $filemaker_fields = $record->getFields();
+
         foreach ($fields as $key => $value)
         {
+            if(!in_array($value, $filemaker_fields)){
+                throw (new FieldDoesNotExist("$value Field Doesn't Exist"));
+            }
             $converted_object[$key] = $record->getField($value);
         }
         return $converted_object;

@@ -22,7 +22,7 @@ trait Paginate
      *
      * @param $response
      */
-    private function attachPaginationData(&$response)
+    protected function attachPaginationData(&$response)
     {
         $max = $this->command->getRange()['max'];
         if (!$max || $max == 1 || $this->skip_last_record){

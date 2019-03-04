@@ -6,6 +6,7 @@ namespace EquineSolutions\IOCFilemaker\Layouts;
 use airmoi\FileMaker\Command\Command;
 use airmoi\FileMaker\FileMaker;
 use EquineSolutions\IOCFilemaker\Connector;
+use EquineSolutions\IOCFilemaker\Exceptions\MethodNotAllowed;
 use EquineSolutions\IOCFilemaker\Traits\ConvertToArray;
 use EquineSolutions\IOCFilemaker\Traits\Filter;
 use EquineSolutions\IOCFilemaker\Traits\Paginate;
@@ -59,10 +60,12 @@ abstract class Layout
 
     /**
      * Layout constructor.
+     * @param null $filemaker_database
      */
-    public function __construct()
+    public function __construct($filemaker_database = null)
     {
-        $this->filemaker = (new Connector())->filemaker();
+        $filemaker_database = $filemaker_database? $filemaker_database:'ioc-database';
+        $this->filemaker = (new Connector($filemaker_database))->filemaker();
         $this->filters = array();
         $this->last_record_id = null;
         $this->skip_last_record = false;
@@ -81,7 +84,7 @@ abstract class Layout
      *
      * @return \Illuminate\Config\Repository|mixed
      */
-    protected abstract function getIdFieldName();
+    public abstract function getIdFieldName();
 
     /**
      * returns the fields map
@@ -91,14 +94,49 @@ abstract class Layout
     public abstract function getFieldsMap();
 
     /**
+     * validates the data passed to create method matches filemaker conditions
+     *
+     * @param $data
+     * @throws MethodNotAllowed
+     * @return boolean
+     */
+    public abstract function validateData(array $data);
+
+    /**
+     * @param FileMaker $filemaker
+     */
+    public function setFilemaker($filemaker)
+    {
+        $this->filemaker = $filemaker;
+    }
+
+    /**
+     * @return FileMaker
+     */
+    public function getFilemaker()
+    {
+        return $this->filemaker;
+    }
+
+    /**
      * returns list of the resource
      *
      * @return Layout
      */
     public function index()
     {
-        $this->command = $this->filemaker->newFindCommand($this->getLayout());
+        $this->command = $this->getFilemaker()->newFindCommand($this->getLayout());
         return $this;
+    }
+
+    /**
+     * returns first element of the resource
+     *
+     * @return Layout
+     */
+    public function first()
+    {
+        return $this->index()->paginate(1);
     }
 
     /**
@@ -109,7 +147,7 @@ abstract class Layout
      */
     public function show($id)
     {
-        $this->command = $this->filemaker->newFindCommand($this->getLayout());
+        $this->command = $this->getFilemaker()->newFindCommand($this->getLayout());
         $this->filter($this->getIdFieldName(), '='.$id);
         return $this;
     }
@@ -119,10 +157,12 @@ abstract class Layout
      *
      * @param $data
      * @return Layout
+     * @throws MethodNotAllowed
      */
-    public function create($data)
+    public function create(array $data)
     {
-        $this->command = $this->filemaker->newAddCommand($this->getLayout(), $data);
+        $this->validateData($data);
+        $this->command = $this->getFilemaker()->newAddCommand($this->getLayout(), $data);
         return $this;
     }
 
@@ -135,7 +175,7 @@ abstract class Layout
      */
     public function edit($record_id, $data)
     {
-        $this->command = $this->filemaker->newEditCommand($this->getLayout(), $record_id, $data);
+        $this->command = $this->getFilemaker()->newEditCommand($this->getLayout(), $record_id, $data);
         return $this;
     }
 
@@ -147,7 +187,7 @@ abstract class Layout
      */
     public function destroy($record_id)
     {
-        $this->command = $this->filemaker->newDeleteCommand($this->getLayout(), $record_id);
+        $this->command = $this->getFilemaker()->newDeleteCommand($this->getLayout(), $record_id);
         return $this;
     }
 
@@ -158,6 +198,7 @@ abstract class Layout
      */
     public function get()
     {
+//        return $this->command->execute()->getRecords();
         $this->applyFilters();
         $this->applySort();
         $response = [
