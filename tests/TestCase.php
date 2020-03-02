@@ -35,7 +35,7 @@ abstract class TestCase extends Orchestra
     protected function getPackageProviders($app)
     {
         return [
-            'EquineSolutions\IOCFilemaker\Providers\IOCFilemakerServiceProvider',
+            'EquineSolutions\IOCFilemaker\Providers\FilemakerServiceProvider',
         ];
     }
 
@@ -50,4 +50,11 @@ abstract class TestCase extends Orchestra
             'app.debug' => true,
         ];
     }
+
+    /** @test */
+    public abstract function it_fetches_a_single_record_from_filemaker_without_mockery_to_check_fields_names();
+
+    /** @test */
+    public abstract function it_inserts_a_single_record();
+
 }

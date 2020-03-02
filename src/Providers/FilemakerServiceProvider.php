@@ -4,15 +4,14 @@ namespace EquineSolutions\IOCFilemaker\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
-class IOCFilemakerServiceProvider extends ServiceProvider
+class FilemakerServiceProvider extends ServiceProvider
 {
     /**
      * Register bindings in the container.
      */
     public function register()
     {
-        $this->mergeConfigFrom(__DIR__ . '/../../config/ioc-filemaker.php', 'ioc-filemaker');
-        $this->mergeConfigFrom(__DIR__ . '/../../config/layouts.php', 'layouts');
+        $this->mergeConfigFrom(__DIR__ . '/../../config/filemaker.php', 'filemaker');
     }
 
     /**
@@ -31,7 +30,7 @@ class IOCFilemakerServiceProvider extends ServiceProvider
     protected function offerPublishing()
     {
         $this->publishes([
-            __DIR__ . '/../config/ioc-filemaker.php' => config_path('ioc-filemaker.php'),
+            __DIR__ . '/../config/ioc-filemaker.php' => config_path('filemaker.php'),
         ], 'resource');
     }
 }
