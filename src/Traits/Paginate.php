@@ -22,7 +22,7 @@ trait Paginate
      *
      * @param $response
      */
-    private function attachPaginationData(&$response)
+    protected function attachPaginationData(&$response)
     {
         $max = $this->command->getRange()['max'];
         if (!$max || $max == 1 || $this->skip_last_record){
@@ -35,7 +35,7 @@ trait Paginate
             $this->setLastRecordId();
         }
         $response['last_id'] = $this->last_record_id;
-        if ($max > $this->last_record_id){
+        if ((int)$response['data'][sizeof($response['data'])-1]['id'] == $this->last_record_id){
             $response['next_page'] = null;
         }
         else{

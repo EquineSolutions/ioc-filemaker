@@ -30,7 +30,7 @@ trait Filter
      * applies filters from the filters array to the command
      *
      */
-    private function applyFilters()
+    protected function applyFilters()
     {
         foreach ($this->filters as $filter)
         {
