@@ -24,7 +24,7 @@ trait Paginate
      */
     protected function attachPaginationData(&$response)
     {
-        $max = $this->command->getRange()['max'];
+        $max = key_exists('max', $this->command->getRange())? $this->command->getRange()['max']:null;
         if (!$max || $max == 1 || $this->skip_last_record){
             return;
         }

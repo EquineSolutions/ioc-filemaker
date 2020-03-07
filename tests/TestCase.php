@@ -7,26 +7,6 @@ use Orchestra\Testbench\TestCase as Orchestra;
 abstract class TestCase extends Orchestra
 {
     /**
-     * Setup the test case.
-     *
-     * @return void
-     */
-    public function setUp()
-    {
-        parent::setUp();
-    }
-
-    /**
-     * Tear down the test case.
-     *
-     * @return void
-     */
-    public function tearDown()
-    {
-        parent::tearDown();
-    }
-
-    /**
      * Get the service providers for the package.
      *
      * @param  \Illuminate\Foundation\Application $app

@@ -7,6 +7,11 @@ use EquineSolutions\IOCFilemaker\Exceptions\MethodNotAllowed;
 
 class TestLayout extends Layout
 {
+    public function __construct()
+    {
+        parent::__construct('koko wawa');
+    }
+
     /**
      * returns the name of the layout
      *
