@@ -28,9 +28,9 @@ class Connector
     {
         $this->filemaker = new FileMaker(
             $database_name,
-            config('filemaker.hostspec'),
-            config('filemaker.username'),
-            config('filemaker.password')
+            env('FILEMAKER_HOSTSPEC'),
+            env('FILEMAKER_USERNAME'),
+            env('FILEMAKER_PASSWORD')
         );
     }
 
