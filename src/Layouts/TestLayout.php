@@ -2,7 +2,6 @@
 
 namespace EquineSolutions\IOCFilemaker\Layouts;
 
-
 use EquineSolutions\IOCFilemaker\Exceptions\MethodNotAllowed;
 
 class TestLayout extends Layout
@@ -25,7 +24,7 @@ class TestLayout extends Layout
     /**
      * returns the field name
      *
-     * @return \Illuminate\Config\Repository|mixed
+     * @return string
      */
     public function getIdFieldName()
     {
@@ -35,7 +34,7 @@ class TestLayout extends Layout
     /**
      * returns the fields map
      *
-     * @return \Illuminate\Config\Repository|mixed
+     * @return array
      */
     public function getFieldsMap()
     {

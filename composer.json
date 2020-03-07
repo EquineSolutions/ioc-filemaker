@@ -5,13 +5,10 @@
     "license": "MIT",
     "require": {
         "php": "^7.3",
-        "airmoi/filemaker": "*",
-        "laravel/framework": "6.0",
-        "mockery/mockery": "^1.2.3",
-        "phpunit/phpunit": "^8.3"
+        "airmoi/filemaker": "*"
     },
     "require-dev": {
-        "orchestra/testbench": "4.0.1"
+        "illuminate/console": "*"
     },
     "autoload": {
         "psr-4": {
