@@ -8,6 +8,7 @@
 
 namespace EquineSolutions\IOCFilemaker;
 use \airmoi\FileMaker\FileMaker;
+use airmoi\FileMaker\FileMakerException;
 
 class Connector
 {
@@ -21,6 +22,7 @@ class Connector
     /**
      * Connector Construct.
      * @param $database_name
+     * @throws FileMakerException
      */
     public function __construct($database_name)
     {

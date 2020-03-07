@@ -13,7 +13,6 @@ use EquineSolutions\IOCFilemaker\Traits\ConvertToArray;
 use EquineSolutions\IOCFilemaker\Traits\Filter;
 use EquineSolutions\IOCFilemaker\Traits\Paginate;
 use EquineSolutions\IOCFilemaker\Traits\Sort;
-use Illuminate\Config\Repository;
 
 abstract class Layout
 {
@@ -84,14 +83,14 @@ abstract class Layout
     /**
      * returns the field name
      *
-     * @return Repository|mixed
+     * @return string
      */
     public abstract function getIdFieldName();
 
     /**
      * returns the fields map
      *
-     * @return Repository|mixed
+     * @return array
      */
     public abstract function getFieldsMap();
 
