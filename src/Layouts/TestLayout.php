@@ -57,4 +57,12 @@ class TestLayout extends Layout
         }
         throw new MethodNotAllowed();
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getIdFieldKeyName()
+    {
+        return 'original_id';
+    }
 }
