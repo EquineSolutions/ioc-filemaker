@@ -88,6 +88,13 @@ abstract class Layout
     public abstract function getIdFieldName();
 
     /**
+     * returns the field key name
+     *
+     * @return string
+     */
+    public abstract function getIdFieldKeyName();
+
+    /**
      * returns the fields map
      *
      * @return array
@@ -268,7 +275,7 @@ abstract class Layout
         $this->last_record_id =  (int)$this->index()
             ->sort(key($this->sort_rule), $order)
             ->paginate(1, 0)
-            ->get()['data'][0]['id'];
+            ->get()['data'][0][$this->getIdFieldKeyName()];
         $this->sort_rule = $old_sort_rule;
         $this->skip_last_record = false;
     }
