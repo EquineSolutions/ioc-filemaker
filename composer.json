@@ -1,26 +1,29 @@
 {
-    "name": "equinesolutiuons/ioc-filemaker",
-    "description": "A communication wrapper between laravel and ioc filemaker db",
+    "name": "equinesolutiuons/filemaker",
+    "description": "A communication wrapper between laravel and filemaker db",
     "type": "library",
     "license": "MIT",
     "require": {
         "php": "^7.3",
-        "airmoi/filemaker": "*"
+        "airmoi/filemaker": "*",
+        "laravel/framework": "^7.0",
+        "phpunit/phpunit": "^9.0"
     },
     "require-dev": {
-        "illuminate/console": "*"
+        "illuminate/console": "*",
+        "orchestra/testbench": "^5.1.0",
+        "mockery/mockery": "dev-master"
     },
     "autoload": {
         "psr-4": {
-            "EquineSolutions\\IOCFilemaker\\": "src"
+            "EquineSolutions\\Filemaker\\": "src"
         },
         "files": [
-            "src/helpers.php"
         ]
     },
     "autoload-dev": {
         "psr-4": {
-            "EquineSolutions\\IOCFilemaker\\Tests\\": "tests"
+            "EquineSolutions\\Filemaker\\Tests\\": "tests"
         }
     },
     "scripts": {
@@ -32,7 +35,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "EquineSolutions\\IOCFilemaker\\Providers\\IOCFilemakerServiceProvider"
+                "EquineSolutions\\Filemaker\\Providers\\FilemakerServiceProvider"
             ]
         }
     },

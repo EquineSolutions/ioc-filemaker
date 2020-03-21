@@ -1,21 +1,19 @@
 <?php
 
-namespace EquineSolutions\IOCFilemaker\Layouts;
+namespace EquineSolutions\Filemaker\Layouts;
 
 use airmoi\FileMaker\Command\Command;
 use airmoi\FileMaker\FileMaker;
 use airmoi\FileMaker\FileMakerException;
-use EquineSolutions\IOCFilemaker\Connector;
-use EquineSolutions\IOCFilemaker\Exceptions\FieldDoesNotExist;
-use EquineSolutions\IOCFilemaker\Exceptions\MethodNotAllowed;
-use EquineSolutions\IOCFilemaker\Traits\ConvertToArray;
-use EquineSolutions\IOCFilemaker\Traits\Filter;
-use EquineSolutions\IOCFilemaker\Traits\Paginate;
-use EquineSolutions\IOCFilemaker\Traits\Sort;
+use airmoi\FileMaker\FileMakerValidationException;
+use EquineSolutions\Filemaker\Connector;
+use EquineSolutions\Filemaker\Exceptions\FieldDoesNotExist;
+use EquineSolutions\Filemaker\Exceptions\MethodNotAllowed;
+use EquineSolutions\Filemaker\Traits\ConvertToArray;
 
 abstract class Layout
 {
-    use Filter, ConvertToArray, Paginate, Sort;
+    use ConvertToArray;
 
     /**
      * The filemaker class.
@@ -39,37 +37,30 @@ abstract class Layout
     protected $filters;
 
     /**
-     * The filters array
-     *
-     * @var int
-     */
-    protected $last_record_id;
-
-    /**
-     * indicates whether getting last variable or paginating to stop recursion
-     *
-     * @var boolean
-     */
-    private $skip_last_record;
-
-    /**
      * the sort rule variable
      *
      * @var boolean
      */
-    private $sort_rule;
+    private $sortRule;
+
+    /**
+     * the pagination flag variable
+     *
+     * @var boolean
+     */
+    private $pagination;
 
     /**
      * Layout constructor.
-     * @param string $database_name
+     * @param string $databaseName
+     * @throws FileMakerException
      */
-    public function __construct($database_name)
+    public function __construct($databaseName)
     {
-        $this->filemaker = (new Connector($database_name))->filemaker();
+        $this->filemaker = (new Connector($databaseName))->filemaker();
         $this->filters = array();
-        $this->last_record_id = null;
-        $this->skip_last_record = false;
-        $this->sort_rule = [$this->getIdFieldName() => FileMaker::SORT_ASCEND];
+        $this->pagination = false;
+        $this->sortRule = [$this->getIdFieldName() => FileMaker::SORT_ASCEND];
     }
 
     /**
@@ -85,13 +76,6 @@ abstract class Layout
      * @return string
      */
     public abstract function getIdFieldName();
-
-    /**
-     * returns the field key name
-     *
-     * @return string
-     */
-    public abstract function getIdFieldKeyName();
 
     /**
      * returns the fields map
@@ -150,27 +134,45 @@ abstract class Layout
      * returns specified resource
      *
      * @param $id
-     * @return Layout
+     * @return array
+     * @throws FieldDoesNotExist
+     * @throws FileMakerException
      */
     public function show($id)
     {
         $this->command = $this->getFilemaker()->newFindCommand($this->getLayout());
         $this->filter($this->getIdFieldName(), '='.$id);
-        return $this;
+
+        return [
+            'data' => $this->convertToArray($this->filemaker,
+                $this->command
+                    ->execute()
+                    ->getRecords()
+            )
+        ];
     }
 
     /**
      * creates new resources with given data
      *
-     * @param $data
-     * @return Layout
+     * @param array $data
+     * @return array
+     * @throws FieldDoesNotExist
+     * @throws FileMakerException
+     * @throws FileMakerValidationException
      * @throws MethodNotAllowed
      */
     public function create(array $data)
     {
         $this->validateData($data);
-        $this->command = $this->getFilemaker()->newAddCommand($this->getLayout(), $data);
-        return $this;
+        return [
+            'data' => $this->convertToArray($this->filemaker,
+                $this->filemaker
+                    ->newAddCommand($this->getLayout(), $data)
+                    ->execute()
+                    ->getRecords()
+            )
+        ];
     }
 
     /**
@@ -178,24 +180,36 @@ abstract class Layout
      *
      * @param $record_id
      * @param $data
-     * @return Layout
+     * @return array
+     * @throws FieldDoesNotExist
+     * @throws FileMakerException
+     * @throws FileMakerValidationException
      */
     public function edit($record_id, $data)
     {
-        $this->command = $this->getFilemaker()->newEditCommand($this->getLayout(), $record_id, $data);
-        return $this;
+        return [
+            'data' => $this->convertToArray($this->filemaker,
+                $this->filemaker
+                    ->newEditCommand($this->getLayout(), $record_id, $data)
+                    ->execute()
+                    ->getRecords()
+            )
+        ];
     }
 
     /**
      * deletes resource with record id specified
      *
      * @param $record_id
-     * @return Layout
+     * @return array
+     * @throws FileMakerException
      */
     public function destroy($record_id)
     {
-        $this->command = $this->getFilemaker()->newDeleteCommand($this->getLayout(), $record_id);
-        return $this;
+        $this->getFilemaker()->newDeleteCommand($this->getLayout(), $record_id)->execute();
+        return [
+            'response' => true
+        ];
     }
 
     /**
@@ -209,74 +223,107 @@ abstract class Layout
     {
         $this->applyFilters();
         $this->applySort();
-        $response = [
-            'data' => $this->convertToArray($this->command->execute()->getRecords())
-        ];
-        $this->attachPaginationData($response);
+        $rawResponse = $this->command->execute();
+        if ($this->pagination){
+            $response = $this->createPaginationData($rawResponse);
+        }
+        $response ['data'] = $this->convertToArray($this->filemaker, $rawResponse->getRecords());
         return $response;
     }
 
+    //      SORTING     //
     /**
-     * executes the insert command and returns mapped array of the created object or throws exception
+     * add sorting rule asc or desc
      *
-     * @return array
-     * @throws FieldDoesNotExist
-     * @throws FileMakerException
+     * @param $key
+     * @param $order
+     * @return $this
      */
-    public function post()
+    public function sort($key, $order = 'asc')
     {
-        $response = [
-            'data' => $this->convertToArray($this->command->execute()->getRecords())
-        ];
+        $order = $order == 'desc'? FileMaker::SORT_DESCEND : FileMaker::SORT_ASCEND;
+        $this->sortRule = [$key => $order];
+        return $this;
+    }
+
+    /**
+     * apply sort rule
+     */
+    public function applySort()
+    {
+        $this->command->addSortRule(key($this->sortRule), 1, current($this->sortRule));
+    }
+    //      END SORTING     //
+
+    //      Filtering     //
+    /**
+     * adds filters to the query
+     *
+     * @param $filters
+     * @param null $value
+     * @return $this
+     */
+    public function filter($filters, $value = null)
+    {
+        if (is_string($filters))
+        {
+            $this->filters[]= [$filters => $value];
+        }
+        else{
+            foreach ($filters as $key => $value)
+            {
+                $this->filters[]= [$key => $value];
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * applies filters from the filters array to the command
+     *
+     */
+    protected function applyFilters()
+    {
+        foreach ($this->filters as $filter)
+        {
+            $this->command->addFindCriterion(key($filter), current($filter));
+        }
+    }
+    //      END FILTERING     //
+
+    //      PAGINATION     //
+    /**
+     * adds pagination parameters to the command
+     *
+     * @param $size
+     * @param int $page
+     * @return $this
+     */
+    public function paginate($size, $page = 0)
+    {
+        $this->pagination = true;
+        $this->command->setRange($page*$size, $page*$size+$size);
+        return $this;
+    }
+
+    /**
+     * adds pagination data to the response
+     *
+     * @param $rawResponse
+     * @return array
+     */
+    protected function createPaginationData($rawResponse)
+    {
+        $response = array();
+        if (sizeof($rawResponse->getRecords())>0){
+            $response['next_page'] = true;
+        }
+        else{
+            $response['next_page'] = false;
+        }
         return $response;
     }
+    //      END PAGINATION     //
 
-    /**
-     * executes the edit command and returns  mapped array of the updated object or throws exception
-     *
-     * @return array
-     * @throws FieldDoesNotExist
-     * @throws FileMakerException
-     */
-    public function update()
-    {
-        $response = [
-            'data' => $this->convertToArray($this->command->execute()->getRecords())
-        ];
-        return $response;
-    }
-
-    /**
-     * executes the delete command and returns true or throws exception
-     *
-     * @return array
-     */
-    public function delete()
-    {
-        $this->command->execute();
-        return [
-            'response' => true
-        ];
-    }
-
-    /**
-     * sets the last record id variable by using pagination with size of 1 to a sorted descending result
-     *
-     * @return void
-     * @throws FieldDoesNotExist
-     * @throws FileMakerException
-     */
-    public function setLastRecordId()
-    {
-        $this->skip_last_record = true;
-        $old_sort_rule = $this->sort_rule;
-        $order = current($this->sort_rule) == FileMaker::SORT_DESCEND? 'asc':'desc';
-        $this->last_record_id =  (int)$this->index()
-            ->sort(key($this->sort_rule), $order)
-            ->paginate(1, 0)
-            ->get()['data'][0][$this->getIdFieldKeyName()];
-        $this->sort_rule = $old_sort_rule;
-        $this->skip_last_record = false;
-    }
 
 }

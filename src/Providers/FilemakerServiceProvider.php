@@ -1,6 +1,6 @@
 <?php
 
-namespace EquineSolutions\IOCFilemaker\Providers;
+namespace EquineSolutions\Filemaker\Providers;
 
 use Illuminate\Support\ServiceProvider;
 

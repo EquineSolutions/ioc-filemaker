@@ -1,79 +1,73 @@
 <?php
 
-namespace EquineSolutions\IOCFilemaker\Traits;
+namespace EquineSolutions\Filemaker\Traits;
 
+use airmoi\FileMaker\FileMaker;
 use airmoi\FileMaker\FileMakerException;
 use airmoi\FileMaker\Object\Record;
-use EquineSolutions\IOCFilemaker\Exceptions\FieldDoesNotExist;
+use EquineSolutions\Filemaker\Exceptions\FieldDoesNotExist;
 
 trait ConvertToArray
 {
     /**
      * converts filemaker result object to mapped array
      *
+     * @param FileMaker $filemaker
      * @param $result
      * @return array
      * @throws FieldDoesNotExist
      * @throws FileMakerException
      */
-    protected function convertToArray($result)
+    protected function convertToArray($filemaker, $result)
     {
-        // type hint the results data and I think returning a laravel
-        // collection is a better choice
-
-        $converted_array = array();
+        $convertedArray = array();
         foreach ($result as $single_record)
         {
-            array_push($converted_array, $this->mapSingle($single_record));
+            array_push($convertedArray, $this->mapSingle($filemaker, $single_record));
         }
 
-        return $converted_array;
+        return $convertedArray;
     }
 
     /**
      * Maps single filemaker object to array
      *
+     * @param FileMaker $fileMaker
      * @param Record $record
      * @return array
      * @throws FieldDoesNotExist
      * @throws FileMakerException
      */
-    protected function mapSingle(Record $record)
+    protected function mapSingle($fileMaker, Record $record)
     {
-        // Again type hint the returned type.
-        // As php and laravel best practice variable names should be in
-        // camelCase instead of snake_case
-
         $fields = $this->getFieldsMap();
-        $converted_object = array();
+        $convertedObject = array();
 
-        $filemaker_fields = $record->getFields();
+        $filemakerFields = $record->getFields();
 
         foreach ($fields as $key => $value)
         {
-            if(!in_array($value, $filemaker_fields)){
+            if(!in_array($value, $filemakerFields)){
                 throw (new FieldDoesNotExist("$value Field Doesn't Exist"));
             }
 
-            $temp_field = strtolower($value);
-            // What is going on here you need to make this more clear and readable.
-            if (((string) strpos($temp_field, 'file')) >='0') {
-                // also looks like this trait is specific to a class that has the method getFilemaker()
-                // this needs to be refactored to something more generic. or pass the file maker object to the method
-                // this is now very tightly coupled with what ever class that is going to use this
-                // unless there is an interface that i don't know about.
-                $full_path = $this->getFilemaker()->getContainerDataURL($record->getField($value));
-                if ($full_path != ''){
-                    $converted_object[$key] =  'http://' . $full_path;
+            $tempField = strtolower($value);
+            // For a file to be sent from the filemaker it is put in a container
+            // in order for me to know that it is a file that it contains a file string in the field name
+            // so I can get the container url
+            if (((string) strpos($tempField, 'file')) >='0') {
+                $fullPath = $fileMaker->getContainerDataURL($record->getField($value));
+                if ($fullPath != ''){
+                    $convertedObject[$key] =  'http://' . $fullPath;
                 }
                 else{
-                    $converted_object[$key] = '';
+                    $convertedObject[$key] = '';
                 }
             } else {
-                $converted_object[$key] = $record->getField($value);
+                $convertedObject[$key] = trim($record->getField($value));
             }
         }
-        return $converted_object;
+        return $convertedObject;
     }
 
 }

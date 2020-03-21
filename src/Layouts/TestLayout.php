@@ -1,14 +1,14 @@
 <?php
 
-namespace EquineSolutions\IOCFilemaker\Layouts;
+namespace EquineSolutions\Filemaker\Layouts;
 
-use EquineSolutions\IOCFilemaker\Exceptions\MethodNotAllowed;
+use EquineSolutions\Filemaker\Exceptions\MethodNotAllowed;
 
 class TestLayout extends Layout
 {
     public function __construct()
     {
-        parent::__construct('koko wawa');
+        parent::__construct('TestDB');
     }
 
     /**
@@ -56,13 +56,5 @@ class TestLayout extends Layout
             return true;
         }
         throw new MethodNotAllowed();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getIdFieldKeyName()
-    {
-        return 'original_id';
     }
 }

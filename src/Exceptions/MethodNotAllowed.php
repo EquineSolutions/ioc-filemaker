@@ -1,7 +1,6 @@
 <?php
 
-namespace EquineSolutions\IOCFilemaker\Exceptions;
-
+namespace EquineSolutions\Filemaker\Exceptions;
 
 use Throwable;
 use Exception;
