@@ -1,5 +1,7 @@
 <?php
 /**
+ * Remove those useless comments
+ *
  * Created by PhpStorm.
  * User: mac
  * Date: 10/20/18
@@ -7,6 +9,7 @@
  */
 
 namespace EquineSolutions\IOCFilemaker;
+
 use \airmoi\FileMaker\FileMaker;
 use airmoi\FileMaker\FileMakerException;
 
@@ -21,11 +24,15 @@ class Connector
 
     /**
      * Connector Construct.
+     *
      * @param $database_name
      * @throws FileMakerException
      */
     public function __construct($database_name)
     {
+        // You should read the config from a config file and not
+        // from the env file directly as best practice
+
         $this->filemaker = new FileMaker(
             $database_name,
             env('FILEMAKER_HOSTSPEC'),

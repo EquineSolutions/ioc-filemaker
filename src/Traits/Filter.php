@@ -34,6 +34,8 @@ trait Filter
     {
         foreach ($this->filters as $filter)
         {
+            // Again this is dependent on something else you need to pass the
+            // command object to this piece of code to be able to work.
             $this->command->addFindCriterion(key($filter), current($filter));
         }
     }

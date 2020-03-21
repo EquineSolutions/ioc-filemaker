@@ -15,7 +15,7 @@ trait Sort
      */
     public function sort($key, $order = 'asc')
     {
-        $order = $order == 'desc'? FileMaker::SORT_DESCEND:FileMaker::SORT_ASCEND;
+        $order = $order == 'desc'? FileMaker::SORT_DESCEND : FileMaker::SORT_ASCEND;
         $this->sort_rule = [$key => $order];
         return $this;
     }

@@ -13,6 +13,9 @@ trait Paginate
      */
     public function paginate($size, $page = 0)
     {
+        // Same concept $this->>command how can I know that the parent class has a command attribute.
+        // The command needs to be passed into the method to perform what ever operations it needs on it
+
         $this->command->setRange($page*$size, $page*$size+$size);
         return $this;
     }

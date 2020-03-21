@@ -11,6 +11,7 @@ class FilemakerServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        // THis is going to break config/filemaker does not exist.
         $this->mergeConfigFrom(__DIR__ . '/../../config/filemaker.php', 'filemaker');
     }
 
@@ -29,6 +30,7 @@ class FilemakerServiceProvider extends ServiceProvider
      */
     protected function offerPublishing()
     {
+        // Again no config file.
         $this->publishes([
             __DIR__ . '/../config/ioc-filemaker.php' => config_path('filemaker.php'),
         ], 'resource');

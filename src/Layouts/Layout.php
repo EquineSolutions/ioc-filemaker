@@ -2,7 +2,6 @@
 
 namespace EquineSolutions\IOCFilemaker\Layouts;
 
-
 use airmoi\FileMaker\Command\Command;
 use airmoi\FileMaker\FileMaker;
 use airmoi\FileMaker\FileMakerException;
