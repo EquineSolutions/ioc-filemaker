@@ -67,7 +67,7 @@ abstract class Layout
         $this->filemaker = (new Connector($this->getDatabaseName()))->filemaker();
         $this->filters = array();
         $this->pagination = false;
-        $this->sortRule = [$this->getIdFieldName() => FileMaker::SORT_ASCEND];
+        $this->sortRule = [$this->getIdKeyName() => FileMaker::SORT_ASCEND];
     }
 
     /**
@@ -82,7 +82,7 @@ abstract class Layout
      *
      * @return string
      */
-    public abstract function getIdFieldName();
+    public abstract function getIdKeyName();
 
     /**
      * returns the fields map
@@ -167,14 +167,12 @@ abstract class Layout
     public function show($id)
     {
         $this->command = $this->getFilemaker()->newFindCommand($this->getLayout());
-        $this->filter($this->getIdFieldName(), '='.$id);
+        $this->filter([$this->getIdKeyName(), '='.$id]);
+
+        $records = $this->command->execute()->getRecords();
 
         return [
-            'data' => $this->convertToArray($this->filemaker,
-                $this->command
-                    ->execute()
-                    ->getRecords()
-            )
+            'data' => $this->convertToArray($this->filemaker, $records)
         ];
     }
 
@@ -285,21 +283,14 @@ abstract class Layout
     /**
      * adds filters to the query
      *
-     * @param $filters
-     * @param null $value
+     * @param array $filters
      * @return $this
      */
-    public function filter($filters, $value = null)
+    public function filter($filters = [])
     {
-        if (is_string($filters))
+        foreach ($filters as $key => $value)
         {
-            $this->filters[]= [$filters => $value];
-        }
-        else{
-            foreach ($filters as $key => $value)
-            {
-                $this->filters[]= [$key => $value];
-            }
+            $this->filters[]= [$key => $value];
         }
         return $this;
     }
@@ -328,12 +319,13 @@ abstract class Layout
     public function paginate($size, $page = 0)
     {
         $this->pagination = true;
+        // set range function takes how many records to skip as first parameter and the last record to get
         $this->command->setRange($page*$size, $page*$size+$size);
         return $this;
     }
 
     /**
-     * adds pagination data to the response
+     * adds pagination data to the response if there is more records the next_page will be true if that is the last one it will be false
      *
      * @param $rawResponse
      * @return array

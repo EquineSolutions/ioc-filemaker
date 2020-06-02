@@ -5,17 +5,10 @@ namespace EquineSolutions\Filemaker\Tests;
 use airmoi\FileMaker\Command\Find;
 use airmoi\FileMaker\FileMaker;
 use EquineSolutions\Filemaker\Exceptions\MethodNotAllowed;
-use EquineSolutions\Filemaker\Layouts\TestLayout;
 use EquineSolutions\Filemaker\Tests\TestCase as TestCase;
 
 class LayoutTest extends TestCase
 {
-
-    public function tearDown() :void
-    {
-        \Mockery::close();
-    }
-
     /** @test */
     public function it_fetches_a_list_of_layout_data()
     {
@@ -89,7 +82,7 @@ class LayoutTest extends TestCase
         $testLayout = new TestLayout();
         $testLayout->setFilemaker($filemaker);
 
-        $this->assertEquals($testLayout->index()->filter('id', 1)->get(), ['data'=>[]]);
+        $this->assertEquals($testLayout->index()->filter(['id' => 1])->get(), ['data'=>[]]);
     }
 
     /** @test */

@@ -1,8 +1,9 @@
 <?php
 
-namespace EquineSolutions\Filemaker\Layouts;
+namespace EquineSolutions\Filemaker\Tests;
 
 use EquineSolutions\Filemaker\Exceptions\MethodNotAllowed;
+use EquineSolutions\Filemaker\Layouts\Layout;
 
 class TestLayout extends Layout
 {
@@ -23,7 +24,7 @@ class TestLayout extends Layout
      *
      * @return string
      */
-    public function getIdFieldName()
+    public function getIdKeyName()
     {
         return 'id';
     }

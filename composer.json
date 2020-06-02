@@ -1,5 +1,5 @@
 {
-    "name": "equinesolutiuons/filemaker",
+    "name": "equinesolutions/filemaker",
     "description": "A communication wrapper between laravel and filemaker db",
     "type": "library",
     "license": "MIT",
