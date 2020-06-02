@@ -51,13 +51,20 @@ abstract class Layout
     private $pagination;
 
     /**
+     * the database name to use in connection
+     *
+     * @var string
+     */
+    protected $databaseName = null;
+
+    /**
      * Layout constructor.
-     * @param string $databaseName
      * @throws FileMakerException
      */
-    public function __construct($databaseName)
+    public function __construct()
     {
-        $this->filemaker = (new Connector($databaseName))->filemaker();
+        $this->databaseName = $this->databaseName? :config('database');
+        $this->filemaker = (new Connector($this->getDatabaseName()))->filemaker();
         $this->filters = array();
         $this->pagination = false;
         $this->sortRule = [$this->getIdFieldName() => FileMaker::SORT_ASCEND];
@@ -83,6 +90,25 @@ abstract class Layout
      * @return array
      */
     public abstract function getFieldsMap();
+
+    /**
+     * returns the database name
+     *
+     * @return string
+     */
+    public function getDatabaseName(){
+        return $this->databaseName;
+    }
+
+    /**
+     * returns the database name
+     *
+     * @param $databaseName
+     * @return void
+     */
+    public function setDatabaseName($databaseName){
+        $this->databaseName = $databaseName;
+    }
 
     /**
      * validates the data passed to create method matches filemaker conditions

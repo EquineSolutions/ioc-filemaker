@@ -6,9 +6,9 @@ use airmoi\FileMaker\Command\Find;
 use airmoi\FileMaker\FileMaker;
 use EquineSolutions\Filemaker\Exceptions\MethodNotAllowed;
 use EquineSolutions\Filemaker\Layouts\TestLayout;
-use Orchestra\Testbench\TestCase as Orchestra;
+use EquineSolutions\Filemaker\Tests\TestCase as TestCase;
 
-class LayoutTest extends Orchestra
+class LayoutTest extends TestCase
 {
 
     public function tearDown() :void
