@@ -5,7 +5,7 @@ namespace EquineSolutions\Filemaker\Tests;
 use EquineSolutions\Filemaker\Exceptions\MethodNotAllowed;
 use EquineSolutions\Filemaker\Layouts\Layout;
 
-class TestLayout extends Layout
+class LevelLayout extends Layout
 {
     /**
      * returns the name of the layout
@@ -14,7 +14,7 @@ class TestLayout extends Layout
      */
     protected function getLayout() :string
     {
-        return "test";
+        return "levels";
     }
 
     /**
@@ -24,7 +24,7 @@ class TestLayout extends Layout
      */
     public function getIdKeyName() :string
     {
-        return 'id';
+        return 'level_id';
     }
 
     /**
@@ -35,22 +35,31 @@ class TestLayout extends Layout
     public function getFieldsMap() :array
     {
         return [
-            'id' => 'id'
+            'id' => 'level_id',
+            'name' => 'Leve Name',
+            'age_from' => 'age from',
+            'age_to' => 'age to',
+            'filemaker_timestamp' => 'Modification'
         ];
     }
 
     /**
      * validates the data passed to create method matches filemaker conditions
      *
-     * @param $data
+     * @param array $data
+     * @return void
      * @throws MethodNotAllowed
-     * @return boolean
      */
     public function validateData(array $data)
     {
-        if(array_key_exists('id', $data)){
-            return true;
-        }
+        throw new MethodNotAllowed();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function validateUpdateData(array $data)
+    {
         throw new MethodNotAllowed();
     }
 
@@ -59,7 +68,7 @@ class TestLayout extends Layout
      */
     public function getDatabaseName() :string
     {
-        return "";
+        return "G7";
     }
 
     /**
@@ -67,7 +76,7 @@ class TestLayout extends Layout
      */
     public function getHost(): string
     {
-        return "";
+        return "n471.fmphost.com";
     }
 
     /**
@@ -75,7 +84,7 @@ class TestLayout extends Layout
      */
     public function getUsername(): string
     {
-        return "";
+        return "Admin";
     }
 
     /**
@@ -83,17 +92,6 @@ class TestLayout extends Layout
      */
     public function getPassword(): string
     {
-        return "";
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function validateUpdateData(array $data)
-    {
-        if(array_key_exists('id', $data)){
-            return true;
-        }
-        throw new MethodNotAllowed();
+        return "P@ssw0rd9666";
     }
 }

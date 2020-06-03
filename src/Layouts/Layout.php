@@ -51,20 +51,11 @@ abstract class Layout
     private $pagination;
 
     /**
-     * the database name to use in connection
-     *
-     * @var string
-     */
-    protected $databaseName = null;
-
-    /**
      * Layout constructor.
-     * @throws FileMakerException
      */
     public function __construct()
     {
-        $this->databaseName = $this->databaseName? :config('database');
-        $this->filemaker = (new Connector($this->getDatabaseName()))->filemaker();
+        $this->filemaker = (new Connector($this->getHost(), $this->getUsername(), $this->getPassword(), $this->getDatabaseName()))->filemaker();
         $this->filters = array();
         $this->pagination = false;
         $this->sortRule = [$this->getIdKeyName() => FileMaker::SORT_ASCEND];
@@ -75,40 +66,49 @@ abstract class Layout
      *
      * @return string
      */
-    protected abstract function getLayout();
+    protected abstract function getLayout() :string;
 
     /**
      * returns the field name
      *
      * @return string
      */
-    public abstract function getIdKeyName();
+    public abstract function getIdKeyName() :string;
 
     /**
      * returns the fields map
      *
      * @return array
      */
-    public abstract function getFieldsMap();
+    public abstract function getFieldsMap() :array;
 
     /**
      * returns the database name
      *
      * @return string
      */
-    public function getDatabaseName(){
-        return $this->databaseName;
-    }
+    public abstract function getDatabaseName() :string;
 
     /**
      * returns the database name
      *
-     * @param $databaseName
-     * @return void
+     * @return string
      */
-    public function setDatabaseName($databaseName){
-        $this->databaseName = $databaseName;
-    }
+    public abstract function getHost() :string;
+
+    /**
+     * returns the database name
+     *
+     * @return string
+     */
+    public abstract function getUsername() :string;
+
+    /**
+     * returns the database name
+     *
+     * @return string
+     */
+    public abstract function getPassword() :string;
 
     /**
      * validates the data passed to create method matches filemaker conditions
@@ -118,6 +118,15 @@ abstract class Layout
      * @return boolean
      */
     public abstract function validateData(array $data);
+
+    /**
+     * validates the data passed to update method matches filemaker conditions
+     *
+     * @param $data
+     * @throws MethodNotAllowed
+     * @return boolean
+     */
+    public abstract function validateUpdateData(array $data);
 
     /**
      * @param FileMaker $filemaker
@@ -208,9 +217,11 @@ abstract class Layout
      * @throws FieldDoesNotExist
      * @throws FileMakerException
      * @throws FileMakerValidationException
+     * @throws MethodNotAllowed
      */
     public function edit($record_id, $data)
     {
+        $this->validateUpdateData($data);
         return [
             'data' => $this->convertToArray($this->filemaker,
                 $this->filemaker

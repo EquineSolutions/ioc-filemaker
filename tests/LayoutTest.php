@@ -206,6 +206,19 @@ class LayoutTest extends TestCase
     }
 
     /** @test */
+    public function it_updates_a_single_layout_but_fails_and_catches_invalid_data_exception()
+    {
+        $filemaker = \Mockery::mock('Filemaker');
+
+        $testLayout = new TestLayout();
+        $testLayout->setFilemaker($filemaker);
+
+        $this->expectException(MethodNotAllowed::class);
+
+        $this->assertEquals($testLayout->edit(1, []), ['data'=>[]]);
+    }
+
+    /** @test */
     public function it_deletes_a_single_layout()
     {
         $filemaker = \Mockery::mock('Filemaker');
