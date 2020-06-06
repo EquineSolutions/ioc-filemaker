@@ -198,13 +198,12 @@ abstract class Layout
     public function create(array $data)
     {
         $this->validateData($data);
+        $records = $this->filemaker
+            ->newAddCommand($this->getLayout(), $data)
+            ->execute()
+            ->getRecords();
         return [
-            'data' => $this->convertToArray($this->filemaker,
-                $this->filemaker
-                    ->newAddCommand($this->getLayout(), $data)
-                    ->execute()
-                    ->getRecords()
-            )
+            'data' => $this->convertToArray($this->filemaker, $records)
         ];
     }
 
@@ -222,13 +221,12 @@ abstract class Layout
     public function edit($record_id, $data)
     {
         $this->validateUpdateData($data);
+        $records = $this->filemaker
+            ->newEditCommand($this->getLayout(), $record_id, $data)
+            ->execute()
+            ->getRecords();
         return [
-            'data' => $this->convertToArray($this->filemaker,
-                $this->filemaker
-                    ->newEditCommand($this->getLayout(), $record_id, $data)
-                    ->execute()
-                    ->getRecords()
-            )
+            'data' => $this->convertToArray($this->filemaker, $records)
         ];
     }
 
