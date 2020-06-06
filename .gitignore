@@ -6,3 +6,5 @@
 /features
 composer.lock
 /dummy
+tests/LevelLayout.php
+tests/LevelLayoutTest.php
