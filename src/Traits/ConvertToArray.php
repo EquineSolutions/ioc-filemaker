@@ -51,11 +51,10 @@ trait ConvertToArray
                 throw (new FieldDoesNotExist("$value Field Doesn't Exist"));
             }
 
-            $tempField = strtolower($value);
             // For a file to be sent from the filemaker it is put in a container
             // in order for me to know that it is a file that it contains a file string in the field name
             // so I can get the container url
-            if (((string) strpos($tempField, 'file')) >='0') {
+            if (((string) strpos($key, 'file')) >='0') {
                 $fullPath = $fileMaker->getContainerDataURL($record->getField($value));
                 if ($fullPath != ''){
                     $convertedObject[$key] =  'http://' . $fullPath;
