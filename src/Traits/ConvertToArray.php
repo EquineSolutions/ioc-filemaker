@@ -14,16 +14,19 @@ trait ConvertToArray
      *
      * @param FileMaker $filemaker
      * @param $result
+     * @param int $filemaker_mapping
      * @return array
      * @throws FieldDoesNotExist
      * @throws FileMakerException
      */
-    protected function convertToArray($filemaker, $result)
+    protected function convertToArray($filemaker, $result, $filemaker_mapping = 0)
     {
         $convertedArray = array();
         foreach ($result as $single_record)
         {
-            array_push($convertedArray, $this->mapSingle($filemaker, $single_record));
+            array_push($convertedArray,
+                !$filemaker_mapping ? $this->mapSingle($filemaker, $single_record):$this->mapSingleWithFilemakerField($filemaker, $single_record)
+            );
         }
 
         return $convertedArray;
@@ -64,6 +67,38 @@ trait ConvertToArray
                 }
             } else {
                 $convertedObject[$key] = trim($record->getField($value));
+            }
+        }
+        return $convertedObject;
+    }
+
+    /**
+     * Maps single filemaker object to array
+     *
+     * @param FileMaker $fileMaker
+     * @param Record $record
+     * @return array
+     * @throws FieldDoesNotExist
+     * @throws FileMakerException
+     */
+    protected function mapSingleWithFilemakerField($fileMaker, Record $record)
+    {
+        $convertedObject = array();
+
+        $filemakerFields = $record->getFields();
+
+        foreach ($filemakerFields as $value)
+        {
+            if (((string) strpos($value, 'file')) >='0') {
+                $fullPath = $fileMaker->getContainerDataURL($record->getField($value));
+                if ($fullPath != ''){
+                    $convertedObject[$value] =  'http://' . $fullPath;
+                }
+                else{
+                    $convertedObject[$value] = '';
+                }
+            } else {
+                $convertedObject[$value] = trim($record->getField($value));
             }
         }
         return $convertedObject;

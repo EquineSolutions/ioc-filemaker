@@ -248,11 +248,12 @@ abstract class Layout
     /**
      * executes the find command and returns mapped array
      *
+     * @param int $filemaker_mapping
      * @return array
      * @throws FieldDoesNotExist
      * @throws FileMakerException
      */
-    public function get()
+    public function get($filemaker_mapping = 0)
     {
         $this->applyFilters();
         $this->applySort();
@@ -260,7 +261,7 @@ abstract class Layout
         if ($this->pagination){
             $response = $this->createPaginationData($rawResponse);
         }
-        $response ['data'] = $this->convertToArray($this->filemaker, $rawResponse->getRecords());
+        $response ['data'] = $this->convertToArray($this->filemaker, $rawResponse->getRecords(), $filemaker_mapping);
         return $response;
     }
 
