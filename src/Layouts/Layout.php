@@ -176,7 +176,8 @@ abstract class Layout
     public function show($id)
     {
         $this->command = $this->getFilemaker()->newFindCommand($this->getLayout());
-        $this->filter([$this->getIdKeyName(), '='.$id]);
+        $this->filter([$this->getIdKeyName() => '='.$id]);
+        $this->applyFilters();
 
         $records = $this->command->execute()->getRecords();
 
